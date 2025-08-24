@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Task from '../models/Task.js';
+import Task from '../models/task.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
@@ -18,10 +18,17 @@ router.post('/', async (req, res, next) => {
 });
 
 // Read (mine)
-router.get('/', async (req, res, next) => {
+/*router.get('/', async (req, res, next) => {
   try {
     const tasks = await Task.find({ userId: req.session.userId }).sort({ createdAt: -1 });
     res.json(tasks);
   } catch (err) {
     next(err);
   }
+});*/
+
+router.get('/', (req, res) => {
+  res.json({ message: 'Tasks endpoint works!' });
+});
+
+export default router;

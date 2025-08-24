@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import crypto from 'crypto';
-import User from '../models/User.js';
+import User from '../models/user.js';
 import { sendResetToken } from '../utils/sendResetToken.js';
 
 const router = Router();
