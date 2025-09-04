@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Holdings Treemap</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #333;
+      padding: 20px;
+    }
+
+    .holdings-container {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .holdings-header h2 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+    }
+
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 15px;
+    }
+
+    .pnl {
+      font-size: 28px;
+      color: green;
+      font-weight: bold;
+    }
+
+    .pnl small {
+      font-size: 14px;
+      margin-left: 8px;
+      color: #4CAF50;
+    }
+
+    .values {
+      text-align: right;
+    }
+
+    .values div {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .treemap {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin: 15px 0;
+      position: relative;
+    }
+
+    .node {
+      position: absolute;
+      box-sizing: border-box;
+      overflow: hidden;
+      font-size: 12px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 1px solid #fff;
+    }
+
+    .total-value {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .radio-buttons {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .radio-buttons input {
+      margin-right: 5px;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <div class="holdings-container">
+    <div class="holdings-header">
+      <h2>Holdings (59)</h2>
+    </div>
+
+    <div class="summary">
+      <div class="pnl">
+        1.97L <small>+49.70%</small><br>
+        <span style="font-size:14px; font-weight:normal; color:#666;">P&amp;L</span>
+      </div>
+      <div class="values">
+        <div>Current value: 5.93L</div>
+        <div>Investment: 3.96L</div>
+      </div>
+    </div>
+
+    <div class="treemap" id="treemap"></div>
+
+    <div class="total-value">₹5,93,288.47</div>
+
+    <div class="radio-buttons">
+      <label><input type="radio" name="view" checked> Current value</label>
+      <label><input type="radio" name="view"> Investment value</label>
+      <label><input type="radio" name="view"> P&amp;L</label>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const holdings = [
+      { name: 'Stock A', value: 120000, color: '#4285F4' },
+      { name: 'Stock B', value: 90000, color: '#00BCD4' },
+      { name: 'Stock C', value: 70000, color: '#9C27B0' },
+      { name: 'Stock D', value: 50000, color: '#4CAF50' },
+      { name: 'Stock E', value: 40000, color: '#FFC107' },
+      { name: 'Stock F', value: 35000, color: '#FF5722' },
+      { name: 'Stock G', value: 30000, color: '#3F51B5' },
+      { name: 'Stock H', value: 25000, color: '#8BC34A' },
+      { name: 'Stock I', value: 20000, color: '#E91E63' },
+      { name: 'Stock J', value: 15000, color: '#009688' }
+    ];
+
+    const width = document.getElementById("treemap").clientWidth;
+    const height = document.getElementById("treemap").clientHeight;
+
+    const root = d3.hierarchy({ children: holdings })
+      .sum(d => d.value)
+      .sort((a, b) => b.value - a.value);
+
+    d3.treemap()
+      .size([width, height])
+      .padding(1)(root);
+
+    const treemapDiv = d3.select("#treemap")
+      .style("position", "relative");
+
+    treemapDiv.selectAll(".node")
+      .data(root.leaves())
+      .enter()
+      .append("div")
+      .attr("class", "node")
+      .style("left", d => d.x0 + "px")
+      .style("top", d => d.y0 + "px")
+      .style("width", d => (d.x1 - d.x0) + "px")
+      .style("height", d => (d.y1 - d.y0) + "px")
+      .style("background", d => d.data.color)
+      .text(d => d.data.name)
+      .on("mousemove", function(event, d) {
+        const percentage = ((d.data.value / total) * 100).toFixed(2);
+        tooltip.style("opacity", 1)
+          .html(`<strong>${d.data.name}</strong><br/>Value: ₹${d.data.value.toLocaleString()}<br/>Share: ${percentage}%`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 30) + "px");
+      })
+      .on("mouseout", function() {
+        tooltip.style("opacity", 0);
+      });
+  </script>
+</body>
+</html>
