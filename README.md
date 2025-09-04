@@ -1,1 +1,1 @@
-#Mayaskara
+A simple JS based tool for analysing your portfolio!
